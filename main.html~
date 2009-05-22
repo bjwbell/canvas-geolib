@@ -1,0 +1,67 @@
+<html><head>
+<title>Line Intersection Tests</title>
+<script type="text/javascript">
+var width = 150;
+var height = 300;
+function getCanvas() {
+return document.getElementById('canvas');
+}
+
+window.addEventListener('load', function() {
+  var canvas = getCanvas();
+  if(canvas && canvas.getContext) {
+    var context = canvas.getContext('2d');
+    if (context) {
+       context.fillStyle = '#fff';
+       context.fillRect(0, 0, width, height);
+    }
+  }
+  canvas.addEventListener('mousemove', mouseMove, false);
+}, false);
+
+function getEventXCoord(ev){
+ if(ev.layerX){ //Firefox
+   return ev.layerX;
+ }
+ return ev.offsetX; //Opera
+}
+function getEventYCoord(ev){
+ if(ev.layerY){ //Firefox
+   return ev.layerY; 
+ }
+ return ev.offsetY; //Opera
+}
+
+function mouseMove(ev) {
+  //alert('t3');
+  var canvas = getCanvas();
+  context = canvas.getContext('2d');
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, width, height);
+  context.fillStyle = '#f00'; //red
+  //alert('t3.5');
+  context.strokeStyle = '#000'; //green
+  context.lineWidth = 4;
+  context.beginPath();
+  //alert('t3.75');
+  context.moveTo(0, 0);
+  //alert('t3.95');
+  var x = getEventXCoord(ev);
+  var y = getEventYCoord(ev);
+  context.lineTo(x, y);
+  //alert('t4');
+  context.closePath();
+  //alert('t5');
+  context.fill();
+  //alert('t6');
+  context.stroke();
+  //alert('t7');
+
+};
+</script>
+</head>
+<body>
+
+  <canvas id="canvas" width="200" height="200"><p>Fallback content goes here.</p></canvas>    
+</body>
+</html>
