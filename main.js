@@ -35,13 +35,17 @@ function getEventYCoord(ev){
 function Vector(x, y){
   this.x = x;
   this.y = y;
+  this.color = '#000';
   this.draw = function() {
     var canvas = getCanvas();
     context = canvas.getContext('2d');
-    context.strokeStyle = '#000'; //black
+    context.strokeStyle = this.color; //black
     context.fillRect(this.x, this.y, 5, 5);
 
   };
+  this.scalarMult = function(scalar){
+	  return new Vector(this.x * scalar, this.y * scalar);
+  }
   this.dot = function(v2) {
     return this.x * v2.x + this.y * v2.y;
   };
@@ -49,8 +53,11 @@ function Vector(x, y){
     return new Vector(-1 * this.y, this.x);
   };
   this.subtract = function(v2) {
-    return new Vector(this.x - v2.x, this.y - v2.y);
+    return this.add(v2.scalarMult(-1));//new Vector(this.x - v2.x, this.y - v2.y);
   };
+  this.add = function(v2) {
+	  return new Vector(this.x + v2.x, this.y + v2.y);
+  }
 }
 
 function Segment(p1, p2){
@@ -76,13 +83,77 @@ function Segment(p1, p2){
 
 }
 
-function intersect(seg1, seg2) {
+// the cross product of vectors v1 and v2.
+function cross(v1, v2) {
+	return v1.x * v2.y - v2.x * v1.y;
+}
 
+/*
+	seg1 is represented by p + t * r where  0 <= t <= 1
+	seg2 is represented by q + u * s where  0 <= u <= 1
+	
+	the intersection of line 1 and line 2 is given by 
+	p + t*r = q + u*s, 
+	let x be the two dimensional cross product then
+	(p + t*r) x s = (q + u*s) x s = q x s
+	which solving for t gives
+	t = (q - p) x s / (r x s).
+	similarly solving for u gives
+	u = (q - p) x r / (r x s).
+	the segments intersect if 0 <= t <= 1 and 0 <= 1 <= u.
+	If r x s is zero then the lines are parallel, in which case if 
+	(q - p) x r = 0 then the lines are co-linear.
+	
+*/
+
+//determine if segments [x1, x2] and [x3, x4] intersect
+function intersect1d(x1, x2, x3, x4){	
+	if((x2 >= x3 || x2 >= x4) && (x1 <= x3 || x1 <= x4)){
+		return 1;
+	}
+	return 0;
+}
+
+var epsilon = 10e-6;
+var DONT_INTERSECT = 0;
+var PARALLEL_DONT_INTERSECT = 1;
+var COLLINEAR_DONT_INTERSECT = 2;
+var INTERSECT = 3;
+var COLLINEAR_INTERSECT = 4;
+function intersect(seg1, seg2, intersectionPoint) {
+	p = seg1.p1;
+	r = seg1.p2.subtract(seg1.p1);
+	q = seg2.p1;
+	s = seg2.p2.subtract(seg2.p1);
+	rCrossS = cross(r, s);
+	// line segments are parallel
+	if(rCrossS <= epsilon && rCrossS >= -1 * epsilon){
+		// line segments are collinear
+		if(cross(q.subtract(p), s) <= epsilon && cross(q.subtrac(p), s) >= -1 * epsilon){
+			if(intersect1d(seg1.p1.x, seg1.p2.x, seg2.p1.x, seg2.p2.x) == 1){
+				return COLLINEAR_INTERSECT;
+			}else{
+				return COLLINEAR_DONT_INTERSECT;
+			}
+		}
+		return PARALLEL_DONT_INTERSECT;
+	}
+	t = cross(q.subtract(p), s)/rCrossS;
+	u = cross(q.subtract(p), r)/rCrossS;
+	if(0 <= u && u <= 1 && 0 <= t && t <= 1){
+		intPoint = p.add(r.scalarMult(t));
+		intersectionPoint.x = intPoint.x;
+		intersectionPoint.y = intPoint.y;
+		return INTERSECT;
+	}else{
+		return DONT_INTERSECT;
+	}
 }
 
 function mouseDown(ev){
   var canvas = getCanvas();
   context = canvas.getContext('2d');
+  debug = 1;
 
 }
 
@@ -95,6 +166,8 @@ function drawLine2(){
   context = canvas.getContext('2d');
 
 }
+
+var debug = 1;
 
 function mouseMove(ev) {
   //alert('t3');
@@ -127,6 +200,11 @@ function mouseMove(ev) {
 
   var seg2 = new Segment(new Vector(0, 100), new Vector(100, 50));
   seg2.draw();
+  var intersectionPoint = new Vector(0, 0);
+  if(intersect(seg1, seg2, intersectionPoint) == INTERSECT){
+	  intersectionPoint.color = '#f00';
+	  intersectionPoint.draw();
+  }
 };
 
 
