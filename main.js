@@ -88,6 +88,38 @@ function cross(v1, v2) {
 	return v1.x * v2.y - v2.x * v1.y;
 }
 
+
+/* 
+determines if the 3 points, p1, p2, p3 form a strictly right turn (i.e. they can't be collinear)
+*/
+function rightTurn(var p1, var p2, var p3)
+{
+	var v1 = p2.subtract(p1);
+	var v2 = p3.subtract(p2);
+	//returns true of the vector from p2 to p3 is a right turn compared to the vector from p1 to p2.
+	if(cross(v1, v2) < 0){
+		return true;
+	}
+	return false;
+}
+
+
+/*
+*/
+
+/*
+determines if the 3 points, p1, p2, p3 form a strictly left turn (i.e. they can't be collinear)
+*/
+function leftTurn(var p1, var p2, var p3){
+	var v1 = p2.subtract(p1);
+	var v2 = p3.subtract(p2);
+	//returns true of the vector from p2 to p3 is a left turn compared to the vector from p1 to p2.
+	if(cross(v1, v2) > 0){
+		return true;
+	}
+	return false;	
+}
+
 /*
 	seg1 is represented by p + t * r where  0 <= t <= 1
 	seg2 is represented by q + u * s where  0 <= u <= 1
