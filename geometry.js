@@ -14,11 +14,12 @@ function Vector(x, y){
   this.x = x;
   this.y = y;
   this.color = '#000';
+  this.size = 5;
   this.draw = function(canvas) {
     var context = canvas.getContext('2d');
-    context.strokeStyle = this.color; //black
+    context.fillStyle = this.color; //black    
     var tthis = transformCoords(x, y);
-    context.fillRect(tthis.x, tthis.y, 5, 5);
+    context.fillRect(tthis.x - this.size/2, tthis.y - this.size/2, this.size, this.size);
 
   };
   this.scalarMult = function(scalar){
@@ -169,19 +170,20 @@ function convexHull(points) {
   Lupper.push(points[1]);
   var n = points.length;
   for(var i = 2; i < n; i = i + 1){
+    
     Lupper.push(points[i]);
     var lN = Lupper.length;
     // if Lupper has more than two points and the last three points do not make a right turn then remove the middle point
     while(lN > 2 && !rightTurn(Lupper[lN - 3], Lupper[lN - 2], Lupper[lN - 1])) {
-      var pn = Lupper.pop();
-      var pn1 = Lupper.pop();
-      var pn2 = Lupper.pop();
-      Lupper.push(pn2);
-      Lupper.push(pn);
-
+	    //alert('c23 i:' + i);
+	    var pn = Lupper.pop();
+	    var pn1 = Lupper.pop();
+	    var pn2 = Lupper.pop();
+	    Lupper.push(pn2);
+	    Lupper.push(pn);
+	    lN = Lupper.length;
     }
   }
-
   // Llower is the set of points for the lower half of the convex hull
   var Llower = new Array();
   Llower.push(points[n-1]);
@@ -197,7 +199,7 @@ function convexHull(points) {
       var pn2 = Llower.pop();
       Llower.push(pn2);
       Llower.push(pn);
-
+      lN = Llower.length;
     }
   }
 

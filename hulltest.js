@@ -1,12 +1,13 @@
 var width = 800;
 var height = 600;
-
+//alert('t1');
 var points = new Array();
 points.push(new Vector(100, 100));
 points.push(new Vector(400, 100));
 points.push(new Vector(350, 400));
 points.push(new Vector(100, 400));
 points.push(new Vector(250, 300));
+//alert('t2');
 
 function getCanvas() {
   return document.getElementById('canvas');
@@ -15,11 +16,12 @@ function getCanvas() {
 window.addEventListener('load', function() {
 			  var canvas = getCanvas();
 			  if(canvas && canvas.getContext) {
-			    var context = canvas.getContext('2d');
-			    if (context) {
-			      context.fillStyle = '#fff';
-			      context.fillRect(0, 0, width, height);
-			    }
+				  initCanvas();
+				  //var context = canvas.getContext('2d');
+				  //if (context) {
+				  	//context.fillStyle = '#fff';
+					//context.fillRect(0, 0, width, height);
+			    	//}
 			  }
 			  canvas.addEventListener('mousemove', mouseMove, false);
 			  canvas.addEventListener('mousedown', mouseDown, false);
@@ -40,43 +42,48 @@ function getEventYCoord(ev){
  return ev.offsetY; //Opera
 }
 
+//alert('t3');
 
-
-var canvas = getCanvas();
-context = canvas.getContext('2d');
-context.fillStyle = '#fff';
-context.fillRect(0, 0, width, height);
-context.fillStyle = '#f00'; //red
-
-context.strokeStyle = '#000'; //green
-context.lineWidth = 4;
-
-hull = points;//convexHull(points);
-for(var i = 0; i < hull.length - 1; i++){
-  var seg = new Segment(hull[i], hull[i + 1]);
-  seg.draw(canvas);
+function initCanvas(){
+	var canvas = getCanvas();
+	context = canvas.getContext('2d');
+	context.fillStyle = '#fff';
+	context.fillRect(0, 0, width, height);
+	context.fillStyle = '#fff'; //white
+	context.strokeStyle = '#000'; //black
+	context.lineWidth = 4;
+	drawConvexHull();
 }
 
-function mouseDown(ev){
-  /*var canvas = getCanvas();
-  var context = canvas.getContext('2d');
+function drawConvexHull() {
+	var canvas = getCanvas();
+	context = canvas.getContext('2d');
+	context.fillStyle = '#fff';
+	context.fillRect(0, 0, width, height);
+	
+	hull = convexHull(points);
+	for(var i = 0; i < hull.length - 1; i++){
+		var seg = new Segment(hull[i], hull[i + 1]);
+		seg.draw(canvas);
+	}
+	var seg = new Segment(hull[0], hull[hull.length - 1]);
+	seg.draw(canvas);
+	for(var i = 0; i < points.length; i++){
+		
+		points[i].color = '#000';	
+		points[i].size = 10;
+		points[i].draw(canvas);
+		
+	}
+}
 
 
-  var x = getEventXCoord(ev);
-  var y = getEventYCoord(ev);
-  points.push(new Vector(x, y));
-  context.fillStyle = '#fff';
-  context.fillRect(0, 0, width, height);
-  context.fillStyle = '#f00'; //red
-
-  context.strokeStyle = '#000'; //green
-  context.lineWidth = 4;
-
-  hull = convexHull(points);
-  for(var i = 0; i < hull.length - 1; i++){
-    var seg = new Segment(hull[i], hull[i + 1]);
-    seg.draw(canvas);
-  }/*
+function mouseDown(ev){	
+	var x = getEventXCoord(ev);
+	var y = getEventYCoord(ev);
+	y = 600 - y;
+	points.push(new Vector(x, y));
+	drawConvexHull();			
 
 }
 
