@@ -1,7 +1,3 @@
-function testFunc(){
-	alert("fuck");
-}
-
 // take an x and y from the source coordinate system to the canvas coordinate system
 function transformCoords(x, y){
   var width = 800;
@@ -219,4 +215,119 @@ function convexHull(points) {
 // compares two vectors, p1 and p2, by their x coordinate
 function sortByX(p1, p2) {
   return p1.x - p2.x;
+}
+
+// computes the smallest enclosing disk a set of points
+function enclosingDisk(points){
+    var disk = [[0, 0], 0];
+    if (points.length < 2){
+	return null;
+    } 
+
+    disk = enclosingDisk2Points(points[0], points[1]);
+    for (var i = 2; i < points.length; i++) {
+	if (inDisk(disk, points[i])) {
+	    continue;
+	}
+	disk = enclosingDiskWithBoundaryPoint(points, i, points[i]);
+    }
+    return disk;
+}
+
+function enclosingDiskWithBoundaryPoint(points, i, p_i){
+    var disk = enclosingDisk2Points(points[0], p_i);
+    for (var j = 1; j < i; j++) {
+	if (inDisk(disk, points[j])){
+	    continue;
+	}
+	disk = enclosingDiskWith2BoundaryPoints(points, j, p_i, points[j]);
+    }
+    return disk;
+}
+
+
+function enclosingDiskWith2BoundaryPoints(points, j, p, q){
+    var disk = enclosingDisk2Points(p, q);
+    for (var k = 0; k < j; k++){
+	if (inDisk(disk, points[k])) {
+	    continue;
+	}
+	disk = enclosingDisk3Points(points[k], p, q);
+    }
+    return disk;
+}
+
+// return the smallest disk enclosing points p and q.
+function enclosingDisk2Points(p, q){
+    var radius = dist(p, q)/2.0;
+    var center = [(p[0] + q[0])/2.0, (p[1] + q[1])/2.0];
+    return [center, radius];
+}
+
+// return the unique disk with p1, p2, and p3 as boundary points.
+function enclosingDisk3Points(_p1, _p2, _p3){
+
+    var p1 = [_p1[0], _p1[1]];
+    var p2 = [_p2[0], _p2[1]];
+    var p3 = [_p3[0], _p3[1]];
+    if (dist(p1, p3) > dist(p1, p2)){
+	var p = p2;
+	p2 = p3;
+	p3 = p;
+    }
+
+    var p = p1;
+    // make p1 the origin
+    p2[0] = p2[0] - p1[0];
+    p2[1] = p2[1] - p1[1];
+    p3[0] = p3[0] - p1[0];
+    p3[1] = p3[1] - p1[1];
+    
+    // apply rotation matrix to make p2.x = 0
+    // the rotation matrix is
+    //   | p2[1]/dist(p2), -1 * p2[0]/dist(p2) |
+    //   | p2[0]/dist(p2), p2[1]/dist(p2)      |
+    //
+    var original_p2 = [p2[0], p2[1]];
+    p2[0] = 0;
+    p2[1] = d(original_p2);
+
+    // apply rotation matrix to p3
+    var original_p3 = [p3[0], p3[1]]
+    p3[0] = original_p2[1]/d(original_p2) * original_p3[0] - original_p2[0]/d(original_p2) * original_p3[1]
+    p3[1] = original_p2[0]/d(original_p2) * original_p3[0] + original_p2[1]/d(original_p2) * original_p3[1]
+
+    // the unique disk with the points p1, p2, and p3 as boundary points is 
+    // defined by the equation y = p2.y/2 & x = (d(p3)^2 + p3.y * p2.y)/(2 * p3.x)
+    var y = p2[1]/2.0;
+    var x = (d(p3) * d(p3) - p3[1] * p2[1])/(2 * p3[0]);
+
+    // apply inverse of rotation matrix 
+    var rotated_x = original_p2[1]/d(original_p2) * x + original_p2[0]/d(original_p2) * y
+    var rotated_y = -1 * original_p2[0]/d(original_p2) * x + original_p2[1]/d(original_p2) * y;
+
+    // translate back
+    rotated_x = rotated_x + p1[0];
+    rotated_y = rotated_y + p1[1];
+    
+    var radius = d([rotated_x - p1[0], rotated_y - p1[1]]);
+    return [[rotated_x, rotated_y], radius];
+    
+}
+
+function inDisk(disk, p){
+    var EPSILON = 1e-5;
+    var center = disk[0];
+    var radius = disk[1];
+    return ((p[0] - center[0]) * (p[0] - center[0]) + ((p[1] - center[1]) * (p[1] - center[1])) <= radius * radius + EPSILON);
+}
+
+// returns the distance between p and q.
+function dist(p, q){   
+    return Math.sqrt((p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]));
+}
+
+// return the distance from p to the origin
+function d(p) {
+    return dist(p, [0, 0]);
 }
