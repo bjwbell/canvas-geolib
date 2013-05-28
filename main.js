@@ -40,7 +40,6 @@ function Vector(x, y){
     var canvas = getCanvas();
     context = canvas.getContext('2d');
     context.strokeStyle = this.color; //black
-    //context.fillRect(this.x, this.y, 5, 5);
     // Let's subtract half of the width and height of the fillRect so that it'll look exactly the point where it
     // interesect
     context.fillRect(this.x-2.5, this.y-2.5, 5, 5);
