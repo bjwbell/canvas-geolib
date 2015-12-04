@@ -1,13 +1,11 @@
 var width = 800;
 var height = 600;
-//alert('t1');
 var points = new Array();
 points.push(new Vector(100, 100));
 points.push(new Vector(400, 100));
 points.push(new Vector(350, 400));
 points.push(new Vector(100, 400));
 points.push(new Vector(250, 300));
-//alert('t2');
 
 function getCanvas() {
   return document.getElementById('canvas');
@@ -17,16 +15,9 @@ window.addEventListener('load', function() {
 			  var canvas = getCanvas();
 			  if(canvas && canvas.getContext) {
 				  initCanvas();
-				  //var context = canvas.getContext('2d');
-				  //if (context) {
-				  	//context.fillStyle = '#fff';
-					//context.fillRect(0, 0, width, height);
-			    	//}
 			  }
 			  canvas.addEventListener('mousemove', mouseMove, false);
 			  canvas.addEventListener('mousedown', mouseDown, false);
-
-
 }, false);
 
 function getEventXCoord(ev){
@@ -42,8 +33,6 @@ function getEventYCoord(ev){
  return ev.offsetY; //Opera
 }
 
-//alert('t3');
-
 function initCanvas(){
 	var canvas = getCanvas();
 	context = canvas.getContext('2d');
@@ -56,25 +45,25 @@ function initCanvas(){
 }
 
 function drawConvexHull() {
-	var canvas = getCanvas();
-	context = canvas.getContext('2d');
-	context.fillStyle = '#fff';
-	context.fillRect(0, 0, width, height);
+    var canvas = getCanvas();
+    var i = 0;
+    var seg;
+    context = canvas.getContext('2d');
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, width, height);
 	
-	hull = convexHull(points);
-	for(var i = 0; i < hull.length - 1; i++){
-		var seg = new Segment(hull[i], hull[i + 1]);
-		seg.draw(canvas);
-	}
-	var seg = new Segment(hull[0], hull[hull.length - 1]);
+    hull = convexHull(points);
+    for(i = 0; i < hull.length - 1; i++){
+	seg = new Segment(hull[i], hull[i + 1]);
 	seg.draw(canvas);
-	for(var i = 0; i < points.length; i++){
-		
-		points[i].color = '#000';	
-		points[i].size = 10;
-		points[i].draw(canvas);
-		
-	}
+    }
+    seg = new Segment(hull[0], hull[hull.length - 1]);
+    seg.draw(canvas);
+    for(i = 0; i < points.length; i++){
+	points[i].color = '#000';	
+	points[i].size = 10;
+	points[i].draw(canvas);
+    }
 }
 
 
@@ -84,7 +73,6 @@ function mouseDown(ev){
 	y = 600 - y;
 	points.push(new Vector(x, y));
 	drawConvexHull();			
-
 }
 
 function getLine2(){
@@ -116,6 +104,6 @@ function mouseMove(ev) {
   seg1.draw(getCanvas());
 
   seg2.draw(getCanvas());*/
-};
+}
 
 
